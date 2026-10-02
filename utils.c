@@ -21,7 +21,6 @@ static int isBlank(const char *s)
     return 1;
 }
 
-/* Keeps asking until the user types a whole number between min and max */
 int readInt(const char *prompt, int min, int max)
 {
     char buf[64];
@@ -47,7 +46,6 @@ int readInt(const char *prompt, int min, int max)
     }
 }
 
-/* Keeps asking until the user types a number that is >= min */
 double readDouble(const char *prompt, double min)
 {
     char buf[64];
@@ -73,7 +71,6 @@ double readDouble(const char *prompt, double min)
     }
 }
 
-/* Reads a non-empty line of text that fits into dest (size includes '\0') */
 void readString(const char *prompt, char *dest, int size)
 {
     char buf[256];
@@ -98,7 +95,6 @@ void readString(const char *prompt, char *dest, int size)
     }
 }
 
-/* Case-insensitive "is key found inside text?" used by the search functions */
 int containsIgnoreCase(const char *text, const char *key)
 {
     char a[256], b[256];
