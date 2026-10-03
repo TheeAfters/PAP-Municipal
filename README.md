@@ -13,7 +13,7 @@ Group Number: __________5
 4. Josef Elago.         226047024
 5. Aron T Haimbodi.     226068757
 6. Nangolo Matheus.     222075287
-7. 
+7. Peter kamati.        224080806
 
 # Project Description
 The Municipal Financial Management System is a menu-driven ANSI  application designed to demonstrate programming concepts covered during the first part of PAP521S.
