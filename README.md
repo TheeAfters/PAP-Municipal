@@ -7,11 +7,11 @@ Project A: Foundation System
 Group Number: __________5
 
 ## Group Members
-1. Lamek Nelondo
+1. Lamek Nelondo.       226007006
 2. Erastus fl Nambala   226025799
 3. pandulo Ashimbamba   226032825
-4. 
-5. 
+4. Joseph Elago.        226047024
+5. Aron T Haimbodi.     226068757
 6. 
 7. 
 
