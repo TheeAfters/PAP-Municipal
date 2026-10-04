@@ -1,133 +1,51 @@
 #include <stdio.h>
-#include <string.h>
 #include "suppliers.h"
+#include "utils.h"
 
-static Supplier suppliers[MAX_SUPPLIERS];
-static int supplierCount = 0;
+Supplier suppliers[MAX_SUPPLIERS];
+int supplierCount = 0;
 
-int getSupplierCount(void)
+static int supplierIdExists(int id)
 {
-    return supplierCount;
-}
-
-const Supplier *getSupplier(int index)
-{
-    if (index < 0 || index >= supplierCount) {
-        return NULL;
-    }
-    return &suppliers[index];
-}
-
-static int findSupplierById(int id)
-{
-    int i;
-    for (i = 0; i < supplierCount; i++) {
-        if (suppliers[i].id == id) {
-            return i;
-        }
-    }
-    return -1;
+    for (int i = 0; i < supplierCount; i++) if (suppliers[i].id == id) return 1;
+    return 0;
 }
 
 void addSupplier(void)
 {
-    Supplier s;
+    if (supplierCount >= MAX_SUPPLIERS) { printf("Supplier storage is full.\n"); return; }
     int id;
-    printf("\n--- Add Supplier ---\n");
-    if (supplierCount >= MAX_SUPPLIERS) {
-        printf("  ! Supplier list is full (max %d).\n", MAX_SUPPLIERS);
-        return;
+    while (1) {
+        id = readInt("Enter supplier ID: ", 1, 2147483647);
+        if (supplierIdExists(id)) printf("That supplier ID already exists.\n"); else break;
     }
-    id = readIntInRange("Enter Supplier ID (1-99999): ", 1, 99999);
-    if (findSupplierById(id) != -1) {
-        printf("  ! A supplier with ID %d already exists.\n", id);
-        return;
-    }
-    s.id = id;
-    readLine("Enter Supplier Name: ", s.name, NAME_LEN);
-    readLine("Enter Email: ", s.email, EMAIL_LEN);
-    readLine("Enter Telephone: ", s.telephone, PHONE_LEN);
-    readLine("Enter Town/Location: ", s.town, SHORT_LEN);
-    suppliers[supplierCount] = s;
+    suppliers[supplierCount].id = id;
+    readString("Enter supplier name: ", suppliers[supplierCount].name, sizeof(suppliers[supplierCount].name));
+    readString("Enter supplier email: ", suppliers[supplierCount].email, sizeof(suppliers[supplierCount].email));
+    readString("Enter telephone number: ", suppliers[supplierCount].telephone, sizeof(suppliers[supplierCount].telephone));
+    readString("Enter town/location: ", suppliers[supplierCount].town, sizeof(suppliers[supplierCount].town));
     supplierCount++;
-    printf("  > Supplier '%s' added successfully.\n", s.name);
+    printf("Supplier added successfully.\n");
 }
 
 void displaySuppliers(void)
 {
-    int i;
-    printf("\n--- Supplier List (%d) ---\n", supplierCount);
-    if (supplierCount == 0) {
-        printf("  (no suppliers recorded yet)\n");
-        return;
-    }
-    printf("%-6s %-20s %-24s %-14s %-14s\n",
-           "ID", "Name", "Email", "Telephone", "Town");
-    printf("------------------------------------------------------------------------------------\n");
-    for (i = 0; i < supplierCount; i++) {
-        printf("%-6d %-20s %-24s %-14s %-14s\n",
-               suppliers[i].id, suppliers[i].name, suppliers[i].email,
-               suppliers[i].telephone, suppliers[i].town);
-    }
+    if (supplierCount == 0) { printf("No suppliers registered.\n"); return; }
+    printf("\n%-6s %-22s %-30s %-18s %-18s\n", "ID", "Name", "Email", "Telephone", "Town");
+    printLine('-', 100);
+    for (int i = 0; i < supplierCount; i++) printf("%-6d %-22s %-30s %-18s %-18s\n", suppliers[i].id, suppliers[i].name, suppliers[i].email, suppliers[i].telephone, suppliers[i].town);
 }
 
 void searchSupplier(void)
 {
-    int choice;
-    printf("\n--- Search Supplier ---\n");
-    if (supplierCount == 0) {
-        printf("  (no suppliers to search)\n");
-        return;
-    }
-    printf("1. Search by ID\n2. Search by Town/Location\n");
-    choice = readIntInRange("Choose search type: ", 1, 2);
-
-    if (choice == 1) {
-        int id = readIntInRange("Enter Supplier ID: ", 1, 99999);
-        int idx = findSupplierById(id);
-        if (idx == -1) {
-            printf("  ! No supplier found with ID %d.\n", id);
+    if (supplierCount == 0) { printf("No suppliers registered.\n"); return; }
+    char search[60];
+    readString("Enter supplier name to search: ", search, sizeof(search));
+    for (int i = 0; i < supplierCount; i++) {
+        if (containsIgnoreCase(suppliers[i].name, search)) {
+            printf("\nSupplier found:\nID: %d\nName: %s\nEmail: %s\nTelephone: %s\nTown/Location: %s\n", suppliers[i].id, suppliers[i].name, suppliers[i].email, suppliers[i].telephone, suppliers[i].town);
             return;
         }
-        printf("  > Found: %s | %s | %s | %s\n",
-               suppliers[idx].name, suppliers[idx].email,
-               suppliers[idx].telephone, suppliers[idx].town);
-    } else {
-        char town[SHORT_LEN];
-        int i, found = 0;
-        readLine("Enter Town/Location: ", town, SHORT_LEN);
-        for (i = 0; i < supplierCount; i++) {
-            if (strcmp(suppliers[i].town, town) == 0) {
-                printf("  > %s (ID %d), %s, %s\n",
-                       suppliers[i].name, suppliers[i].id,
-                       suppliers[i].email, suppliers[i].telephone);
-                found = 1;
-            }
-        }
-        if (!found) {
-            printf("  ! No suppliers located in '%s'.\n", town);
-        }
     }
-}
-
-void supplierMenu(void)
-{
-    int choice;
-    do {
-        printf("\n===== SUPPLIER MANAGEMENT =====\n");
-        printf("1. Add Supplier\n");
-        printf("2. Display Suppliers\n");
-        printf("3. Search Supplier\n");
-        printf("4. Back to Main Menu\n");
-        choice = readIntInRange("Enter your choice: ", 1, 4);
-        switch (choice) {
-            case 1: addSupplier();      break;
-            case 2: displaySuppliers(); break;
-            case 3: searchSupplier();   break;
-            case 4: return;
-        }
-        if (choice != 4) {
-            pauseScreen();
-        }
-    } while (choice != 4);
+    printf("Supplier not found.\n");
 }
